@@ -10,29 +10,47 @@ const PatientDataSchema = z.object({
   patient_id: z.string(),
 });
 
-const PATIENT_DATA: Record<string, any> = {
-  "P001": {
+type PatientDataRequest = z.infer<typeof PatientDataSchema>;
+
+type LabResults = {
+  HbA1c: string;
+  ALT: string;
+  AST: string;
+  eGFR: string;
+};
+
+type PatientRecord = {
+  name: string;
+  age: number;
+  lab_results: LabResults;
+  doctor_notes: string;
+};
+
+const PATIENT_DATA: Record<string, PatientRecord> = {
+  P001: {
     name: "John Doe",
     age: 45,
     lab_results: {
       HbA1c: "7.2%",
       ALT: "45 U/L",
       AST: "38 U/L",
-      eGFR: "85 mL/min/1.73m2"
+      eGFR: "85 mL/min/1.73m2",
     },
-    doctor_notes: "Patient has history of Type 2 Diabetes. Shows interest in clinical trials for new glucose management medications. No history of cardiovascular disease. Currently stable."
+    doctor_notes:
+      "Patient has history of Type 2 Diabetes. Shows interest in clinical trials for new glucose management medications. No history of cardiovascular disease. Currently stable.",
   },
-  "P002": {
+  P002: {
     name: "Jane Smith",
     age: 58,
     lab_results: {
       HbA1c: "8.5%",
       ALT: "110 U/L",
       AST: "95 U/L",
-      eGFR: "55 mL/min/1.73m2"
+      eGFR: "55 U/L",
     },
-    doctor_notes: "Patient presents with elevated liver enzymes. Possible non-alcoholic fatty liver disease (NAFLD). Chronic kidney disease Stage 3a. Not suitable for trials requiring high renal clearance."
-  }
+    doctor_notes:
+      "Patient presents with elevated liver enzymes. Possible non-alcoholic fatty liver disease (NAFLD). Chronic kidney disease Stage 3a. Not suitable for trials requiring high renal clearance.",
+  },
 };
 
 const server = new Server(
@@ -52,7 +70,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: [
       {
         name: "get_patient_data",
-        description: "Fetch lab results and doctor notes for a specific patient ID from the legacy SQL database.",
+        description:
+          "Fetch lab results and doctor notes for a specific patient ID from the legacy SQL database.",
         inputSchema: {
           type: "object",
           properties: {
@@ -73,7 +92,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     throw new Error("Tool not found");
   }
 
-  const { patient_id } = PatientDataSchema.parse(request.params.arguments);
+  const { patient_id }: PatientDataRequest = PatientDataSchema.parse(
+    request.params.arguments,
+  );
   const data = PATIENT_DATA[patient_id];
 
   if (!data) {
