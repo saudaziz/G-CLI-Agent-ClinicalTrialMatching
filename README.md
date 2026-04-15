@@ -49,7 +49,7 @@ pip install -r requirements.txt
 Configure your LLM provider and network settings:
 ```env
 LLM_PROVIDER=ollama
-OLLAMA_BASE_URL=http://192.168.68.190:11434
+OLLAMA_BASE_URL=http://127.0.0.1:11434
 OLLAMA_MODEL=gemma4:latest
 ```
 
