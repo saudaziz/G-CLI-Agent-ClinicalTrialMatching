@@ -1,0 +1,18 @@
+Clinical Trial Protocol: GLUCO-SAFE-2026
+Phase: III
+Condition: Type 2 Diabetes Mellitus
+
+Inclusion Criteria (Summary Index):
+- Adults aged 18-75.
+- Diagnosed with Type 2 Diabetes for at least 6 months.
+- HbA1c between 7.0% and 9.5%.
+- Stable medication regimen for at least 3 months.
+
+Exclusion Criteria / Lab Thresholds (Vector Index):
+- Liver Function: ALT or AST > 3x Upper Limit of Normal (ULN). Assume ULN is 40 U/L. (ALT > 120 or AST > 120 is exclusion).
+- Renal Function: eGFR < 60 mL/min/1.73m2.
+- History of cardiovascular disease (stroke, myocardial infarction).
+- Pregnancy or breastfeeding.
+
+Trial Objective:
+To evaluate the safety and efficacy of GLUCO-SAFE in patients with Type 2 Diabetes who are not adequately controlled on Metformin.
