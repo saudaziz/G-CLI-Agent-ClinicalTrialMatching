@@ -52,6 +52,7 @@ LLM_PROVIDER=ollama
 OLLAMA_BASE_URL=http://127.0.0.1:11434
 OLLAMA_MODEL=gemma4:latest
 ```
+Or better yet add them to your environment
 
 ## Running the MVP
 ```powershell
