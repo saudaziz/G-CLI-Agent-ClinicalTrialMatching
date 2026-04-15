@@ -1,80 +1,68 @@
 # Agentic Clinical Trial Matching System
 
-This project implements an MVP for an Agentic Clinical Trial Matching System using the Model Context Protocol (MCP), LlamaIndex, and LangGraph.
+An AI-powered MVP that bridges legacy healthcare data and modern research protocols using **LangGraph**, **LlamaIndex**, and the **Model Context Protocol (MCP)**.
 
-## Architecture
+## Scenario: The Clinical Recruitment Bottleneck
 
-1.  **MCP Server (TypeScript)**: Simulates a legacy SQL database containing patient records (lab results and doctor notes).
-2.  **RAG Pipeline (LlamaIndex)**: Indexes Clinical Trial Protocol documents using both a Summary Index (high-level criteria) and a Vector Index (specific lab thresholds).
-3.  **Multi-Agent Flow (LangGraph)**:
-    - **Researcher Agent**: Fetches patient data via MCP and trial rules via RAG.
-    - **Orchestrator Agent**: Analyzes the comparison and determines if there is a match.
-    - **Executor Agent**: Generates a detailed Match Justification report in Markdown.
+A pharmaceutical research organization manages hundreds of active clinical trials. Currently, specialized medical coordinators manually review thousands of patient electronic health records (EHR) to determine if they meet strict "Inclusion/Exclusion" criteria buried in 200-page Clinical Trial Protocols (PDFs). 
 
-## Multi-Model Support
+The patient data resides in a legacy SQL-based Hospital Information System (HIS) that lacks modern APIs, creating a critical bottleneck in **Healthcare, Pharmaceuticals, and Biotechnology**. Delayed recruitment is the #1 reason trials fail, costing millions per day in lost patent life.
 
-The system is configurable to use different LLM providers via a toggle in the `.env` file:
-- **Anthropic**: Claude 3.5 Sonnet.
-- **Gemini**: Google's Gemini 1.5 Flash (free tier).
-- **Ollama**: Local or network instances (e.g., `gemma4:latest`).
+**Similar Scenarios:** Veteran affairs benefit adjudication, complex insurance underwriting, and legal discovery.
 
-### Local Embedding Strategy
-To avoid `501: model does not support embeddings` errors often found in Ollama generative models, this system uses a **Hybrid RAG approach**:
-- **Embeddings**: Handled locally on your machine using the `BAAI/bge-small-en-v1.5` model (automatically downloaded via HuggingFace).
-- **Inference**: Handled by your remote/local Ollama server.
+## The Agentic Design
 
-## Setup
+### Agent Roles
+- **The Researcher (Medical Analyst):** Uses RAG to parse the Trial Protocol PDF and an MCP Server to securely query the legacy patient database for specific lab results and ICD-10 codes.
+- **The Orchestrator (Clinical Lead):** Receives the trial ID, sets recruitment goals, and manages the logic flow between data extraction and eligibility.
+- **The Executor (Regulatory Reporter):** Compiles a "Match Justification Report" citing specific protocol pages and patient record timestamps.
 
-### 1. MCP Server
+### The Math of Efficiency
+Given $P = 10,000$ patients in a database:
+- **Human Manual Review:** $H_{time} = 30 \text{ mins/patient}$ → **5,000 hours**.
+- **Agentic Review:** $A_{time} = 20 \text{ seconds/patient}$ → **~55 hours**.
+- **Efficiency Ratio ($C_e$):** Roughly **150:1** compared to professional human rates vs. token costs.
+
+## Technical Stack
+- **Languages:** TypeScript (MCP Server), Python (Agent Logic).
+- **Orchestration:** **LangGraph** (Stateful multi-agent workflows).
+- **RAG Framework:** **LlamaIndex** (Summary & Vector indexing).
+- **Connectivity:** **MCP (Model Context Protocol)** as a secure bridge to legacy SQL/HIS.
+- **LLM Support:** Claude 3.5 Sonnet, Gemini 1.5 Flash, or local **Ollama (Gemma4)**.
+
+## Setup & Configuration
+
+### 1. MCP Server (Legacy Data Simulation)
 ```bash
 cd mcp-server
-npm install
-npm run build
+npm install && npm run build
+npm start
 ```
 
-### 2. Agent System
+### 2. Agent System (Python Logic)
 ```bash
 cd agent-system
 pip install -r requirements.txt
 ```
-- Configure your `.env` file (see Configuration below).
-- Place your trial protocol PDF/txt in `agent-system/data/`.
 
-## Configuration (`agent-system/.env`)
-
-Ensure your `.env` matches your environment. For the network instance used during development:
-
+### 3. Environment Configuration (`agent-system/.env`)
+Configure your LLM provider and network settings:
 ```env
-# Toggle between: anthropic, gemini, ollama
 LLM_PROVIDER=ollama
-
-# API Keys (Required only for cloud providers)
-ANTHROPIC_API_KEY=your_key
-GOOGLE_API_KEY=your_key
-
-# Ollama Configuration
 OLLAMA_BASE_URL=http://192.168.68.190:11434
 OLLAMA_MODEL=gemma4:latest
 ```
 
-**Note:** `OLLAMA_BASE_URL` must be the **root URL** (e.g., `http://IP:11434`), not an API endpoint like `/api/tags`.
-
 ## Running the MVP
+```powershell
+Set-Location agent-system; python main.py
+```
 
-1.  **Start the MCP Server** (in one terminal):
-    ```bash
-    cd mcp-server
-    npm start
-    ```
-2.  **Run the Multi-Agent Workflow**:
-    ```bash
-    cd agent-system
-    python main.py
-    ```
+## KPI & ROI
+- **Enrollment Speed:** Targeted 30-40% reduction in recruitment phase.
+- **Accuracy:** High-precision matching citing specific protocol pages.
+- **ROI:** Potential savings of **$1M+ per trial** in operational overhead and accelerated time-to-market.
 
-## Troubleshooting
-
-- **Connection Error**: Ensure your Ollama server is running and accessible via the specified IP.
-- **Model Not Found**: Check available models by visiting `http://IP:11434/api/tags` and ensure the `OLLAMA_MODEL` matches exactly (e.g., `gemma4:latest`).
-- **Embedding Support**: If you switch back to `OllamaEmbedding` and see a 501 error, it means the model does not support the `/api/embed` endpoint. The current configuration uses local embeddings to bypass this.
-
+---
+**License:** MIT  
+**Author:** Saud Aziz
