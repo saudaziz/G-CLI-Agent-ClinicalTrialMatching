@@ -1,0 +1,10 @@
+llama-index
+langgraph
+langchain
+langchain-anthropic
+langchain-google-genai
+langchain-ollama
+python-dotenv
+pandas
+pydantic
+PyPDF2
