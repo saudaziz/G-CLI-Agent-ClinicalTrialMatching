@@ -33,29 +33,36 @@ class AgentState(TypedDict):
     justification: str
 
 
+def _create_ollama() -> Any:
+    from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+    from llama_index.llms.ollama import Ollama
+
+    base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+    model = os.getenv("OLLAMA_MODEL", "gemma4:latest")
+
+    Settings.llm = Ollama(model=model, base_url=base_url, request_timeout=300.0)
+    Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
+    return ChatOllama(model=model, base_url=base_url, temperature=0)
+
+
+LLM_FACTORIES = {
+    "anthropic": lambda: ChatAnthropic(model="claude-3-5-sonnet-20240620", temperature=0),
+    "gemini": lambda: ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0),
+    "ollama": _create_ollama,
+}
+
+
 def get_llm() -> Any:
     provider = os.getenv("LLM_PROVIDER", "anthropic").strip().lower()
 
-    if provider == "anthropic":
+    if provider in {"anthropic", "gemini"}:
         Settings.embed_model = "local"
-        return ChatAnthropic(model="claude-3-5-sonnet-20240620", temperature=0)
 
-    if provider == "gemini":
-        Settings.embed_model = "local"
-        return ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0)
+    factory = LLM_FACTORIES.get(provider)
+    if factory is None:
+        raise ValueError(f"Unsupported LLM provider: {provider}")
 
-    if provider == "ollama":
-        from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-        from llama_index.llms.ollama import Ollama
-
-        base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-        model = os.getenv("OLLAMA_MODEL", "gemma4:latest")
-
-        Settings.llm = Ollama(model=model, base_url=base_url, request_timeout=300.0)
-        Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
-        return ChatOllama(model=model, base_url=base_url, temperature=0)
-
-    raise ValueError(f"Unsupported LLM provider: {provider}")
+    return factory()
 
 
 def load_documents(data_dir: Path) -> List[Any]:
