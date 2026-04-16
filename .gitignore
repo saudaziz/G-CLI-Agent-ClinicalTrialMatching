@@ -29,3 +29,17 @@ storage/
 # OS
 .DS_Store
 Thumbs.db
+
+# .NET
+bin/
+obj/
+*.user
+*.userosscache
+*.sln.doccache
+*.suo
+*.user
+*.userosscache
+*.sln.doccache
+*.suo
+.vs/
+TestResults/
